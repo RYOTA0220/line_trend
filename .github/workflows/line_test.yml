@@ -1,0 +1,36 @@
+name: Test LINE push
+
+on:
+  workflow_dispatch:  # 手動実行のみ
+
+jobs:
+  test-line-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show env info
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_GROUP_ID: ${{ secrets.LINE_GROUP_ID }}
+        run: |
+          echo "TOKEN LENGTH: ${#LINE_CHANNEL_ACCESS_TOKEN}"
+          echo "GROUP ID: $LINE_GROUP_ID"
+
+      - name: Send test message to LINE
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_GROUP_ID: ${{ secrets.LINE_GROUP_ID }}
+        run: |
+          echo "=== curl start ==="
+          curl -v -X POST https://api.line.me/v2/bot/message/push \
+            -H "Authorization: Bearer ${LINE_CHANNEL_ACCESS_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "to": "'"${LINE_GROUP_ID}"'",
+              "messages":[
+                {
+                  "type":"text",
+                  "text":"GitHub Actions からのテスト送信だよ📮"
+                }
+              ]
+            }'
+          echo "=== curl end ==="
