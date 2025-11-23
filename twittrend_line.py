@@ -45,11 +45,18 @@ def fetch_trends_top50():
     trends = []
     # 最大50位まで。49位しかなくてもOK
     for li in li_tags[:50]:
-        text = li.get_text(strip=True)
-        # 先頭の「1. 」のような番号を除去
+        # テキストを取得（間にスペースを入れておく）
+        text = li.get_text(" ", strip=True)
+
+        # 先頭の「1. 」のような順位番号を削除
         text = re.sub(r"^\d+\.\s*", "", text)
+
+        # 末尾の「17,371件のツイート」などを削除
+        text = re.sub(r"\s*\d[\d,]*件のツイート", "", text)
+
         # 余計な空白を1つに
-        text = re.sub(r"\s+", " ", text)
+        text = re.sub(r"\s+", " ", text).strip()
+
         trends.append(text)
 
     return trends
@@ -95,7 +102,8 @@ def send_line_message(text):
 
     url = "https://api.line.me/v2/bot/message/push"
     headers = {
-        "Authorization": f"Bearer {channel_access_token}",
+        "Authorization": f"Bearer {channel_access_token}"
+        ,
         "Content-Type": "application/json",
     }
     payload = {
