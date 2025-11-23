@@ -77,7 +77,12 @@ def build_message(trends):
         lines.append(f"{i}. {t}")
 
     body = "\n".join(lines)
-    message = f"{header}\n{body}"
+
+    # ここでリンクも含めて1メッセージにまとめる
+    message = (
+        f"{header}\n{body}\n\n"
+        "さらにトレンドを確認しに行く👉 https://x.com/explore/tabs/trending"
+    )
 
     # LINEの上限対策（余裕をもって絞る）
     if len(message) > 4800:
@@ -102,8 +107,7 @@ def send_line_message(text):
 
     url = "https://api.line.me/v2/bot/message/push"
     headers = {
-        "Authorization": f"Bearer {channel_access_token}"
-        ,
+        "Authorization": f"Bearer {channel_access_token}",
         "Content-Type": "application/json",
     }
     payload = {
@@ -113,7 +117,7 @@ def send_line_message(text):
                 "type": "text",
                 "text": text,
             }
-        ],  # ← 要素1つなので吹き出し1個
+        ],  # 吹き出し1個
     }
 
     resp = requests.post(url, headers=headers, json=payload, timeout=10)
