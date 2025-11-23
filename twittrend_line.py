@@ -56,7 +56,7 @@ def fetch_trends_top50():
 
 
 def build_message(trends):
-    """トレンドのリストからLINEに送るテキストを組み立てる。"""
+    """トレンドのリストからLINEに送るテキストを組み立てる（吹き出し1個分）。"""
     jst = timezone(timedelta(hours=9))
     now_jst = datetime.now(tz=jst)
     header = (
@@ -80,6 +80,7 @@ def build_message(trends):
 
 
 def send_line_message(text):
+    """LINEにテキストを1メッセージ（吹き出し1個）で送信する。"""
     channel_access_token = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN")
     group_id = os.environ.get("LINE_GROUP_ID")
 
@@ -104,7 +105,7 @@ def send_line_message(text):
                 "type": "text",
                 "text": text,
             }
-        ],
+        ],  # ← 要素1つなので吹き出し1個
     }
 
     resp = requests.post(url, headers=headers, json=payload, timeout=10)
@@ -117,14 +118,12 @@ def send_line_message(text):
 
 
 def main():
-    # まずはトレンドがちゃんと取れているか確認する
+    # 1〜50位（たまに49位）まで全部取得
     trends = fetch_trends_top50()
     print("DEBUG: trends count =", len(trends))
 
-    # 最初は安全のため「上位10件だけ」送る
-    short_trends = trends[:10]
-
-    message = build_message(short_trends)
+    # 全件を1つのメッセージにまとめて送信
+    message = build_message(trends)
     send_line_message(message)
 
 
